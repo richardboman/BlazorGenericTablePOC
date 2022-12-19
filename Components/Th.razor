@@ -1,24 +1,20 @@
-﻿<th role="@(_sortable ? "button" : "")" @onclick="() => OnSort.Invoke(PropertyName)">@ChildContent</th>
+﻿<th role="@(_sortable ? "button" : "")" @onclick="() => OnSort?.Invoke(PropertyName)">@ChildContent</th>
 
 @code {
+    private bool _sortable;
+
     [CascadingParameter]
     public Action<string> OnSort { get; set; }
 
     [Parameter]
-    public RenderFragment ChildContent { get; set; }
-
-    [Parameter]
     public string PropertyName { get; set; }
 
-    private bool _sortable => !string.IsNullOrEmpty(PropertyName) && OnSort is not null;
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
 
     protected override void OnInitialized()
     {
-        //if (Parent is null)
-        //{
-        //    throw new ArgumentNullException(nameof(Parent));
-        //}
-
+        _sortable = !string.IsNullOrEmpty(PropertyName) && OnSort is not null;
         base.OnInitialized();
     }
 }
