@@ -1,0 +1,48 @@
+﻿@typeparam TItem
+
+<table class="table @(OnRowclick.HasDelegate ? "table-hover" : "")">
+    <thead>
+        <tr>
+            <CascadingValue Value="this.SortColumn" IsFixed="true">
+                @TableHeaderTemplate
+            </CascadingValue>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Items)
+        {
+            <tr role="@(OnRowclick.HasDelegate ? "button" : "")" @onclick="() => HandleRowClick(item)">@TableRowTemplate(item)</tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    [Parameter] public RenderFragment TableHeaderTemplate { get; set; }
+    [Parameter] public RenderFragment<TItem> TableRowTemplate { get; set; }
+
+    [Parameter] public ICollection<TItem> Items { get; set; }
+
+    [Parameter] public string SortField { get; set; }
+    [Parameter] public bool IsAscending { get; set; }
+
+    [Parameter] public EventCallback<SortEventArgs> OnSort { get; set; }
+    [Parameter] public EventCallback<TItem> OnRowclick { get; set; }
+
+    private void SortColumn(string field)
+    {
+        if (OnSort.HasDelegate)
+        {
+            IsAscending = field == SortField ? !IsAscending : true;
+            SortField = field;
+            OnSort.InvokeAsync(new SortEventArgs { PropertyName = field, SortOrder = IsAscending ? "ASC" : "DESC" });
+        }
+    }
+
+    private void HandleRowClick(TItem item)
+    {
+        if (OnRowclick.HasDelegate)
+        {
+            OnRowclick.InvokeAsync(item);
+        }
+    }
+}

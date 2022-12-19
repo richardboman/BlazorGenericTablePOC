@@ -1,0 +1,24 @@
+﻿<th role="@(_sortable ? "button" : "")" @onclick="() => OnSort.Invoke(PropertyName)">@ChildContent</th>
+
+@code {
+    [CascadingParameter]
+    public Action<string> OnSort { get; set; }
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public string PropertyName { get; set; }
+
+    private bool _sortable => !string.IsNullOrEmpty(PropertyName) && OnSort is not null;
+
+    protected override void OnInitialized()
+    {
+        //if (Parent is null)
+        //{
+        //    throw new ArgumentNullException(nameof(Parent));
+        //}
+
+        base.OnInitialized();
+    }
+}

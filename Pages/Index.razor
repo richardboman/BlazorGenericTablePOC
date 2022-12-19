@@ -1,0 +1,49 @@
+﻿@page "/"
+
+<PageTitle>Index</PageTitle>
+
+<h1>Blazor generic table POC</h1>
+
+<Table @ref="_table" TItem="Person" Items="TestList" OnSort="OnSort" OnRowclick="OnRowClick">
+    <TableHeaderTemplate>
+        <Th PropertyName="@nameof(Person.FirstName)">Namn</Th>
+        <Th PropertyName="@nameof(Person.LastName)">Efternamn</Th>
+        <Th PropertyName="@nameof(Person.Phone)">Telefon</Th>
+    </TableHeaderTemplate>
+    <TableRowTemplate>
+        <td>@context.FirstName</td>
+        <td>@context.LastName</td>
+        <td>@context.Phone</td>
+    </TableRowTemplate>
+</Table>
+
+@code {
+    [Inject] IJSRuntime JSRuntime { get; set; }
+
+    private Table<Person> _table;
+
+    private ICollection<Person> TestList = new List<Person>
+    {
+        new Person { FirstName = "Lars", LastName = "Larsson", Phone = "0709999993" },
+        new Person { FirstName = "Roland", LastName = "Rolandsson", Phone = "0709999992" },
+        new Person { FirstName = "Ulrik", LastName = "Ulriksson", Phone = "0709999990" },
+        new Person { FirstName = "Adam", LastName = "Adamsson", Phone = "0709999991" }
+    };
+
+    private async void OnRowClick(Person person)
+    {
+        await JSRuntime.InvokeVoidAsync("alert", $"{person.FirstName} {person.LastName} - {person.Phone}");
+    }
+
+    private void OnSort(SortEventArgs args)
+    {
+        TestList = TestList.OrderByDynamic(args.PropertyName, args.SortOrder);
+    }
+
+    public class Person
+    {
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string Phone { get; set; }
+    }
+}
